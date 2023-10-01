@@ -4,12 +4,15 @@ import Form from './components/Form'
 import PeopleList from './components/PeopleList'
 import axios from 'axios'
 import personService from './services/people'
+import './index.css'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState({type:'', text:''})
   /* const [filteredPeople, setFilteredPeople] = useState([]) */
 
   useEffect(() => {
@@ -52,7 +55,17 @@ const App = () => {
               setPersons(persons.map(person => person.name !== newName ? person : returnedPerson))
               setNewName('')
               setNewNumber('')
+              setNotificationMessage({...notificationMessage, type: 'info', text:`Updated ${newName}'s number`})
+              setTimeout(() => {
+                setNotificationMessage('')
+              }, 5000)
             })
+          .catch(error => {
+            setNotificationMessage({...notificationMessage, type: 'error', text:`Information of ${newName} has already been removed from the server.`})
+            setTimeout(() => {
+              setNotificationMessage('')
+            }, 5000)
+          })
         return
       }
     }
@@ -68,6 +81,10 @@ const App = () => {
         setPersons([...persons, returnedInfo])
         setNewName('')
         setNewNumber('')
+        setNotificationMessage({...notificationMessage, type: 'info', text:`Added ${returnedInfo.name}'s number`})
+        setTimeout(() => {
+          setNotificationMessage('')
+        }, 5000)
       })
 
 /*     setPersons([...persons, { name: newName, number: newNumber }]) */
@@ -91,9 +108,11 @@ const App = () => {
         .removeNumber(id)
          .then(setPersons(personsWithoutDeleted))
         .catch(error => {
-          alert(
-            `Unable to delete this person.`
-          ) })
+          setNotificationMessage({...notificationMessage, type: 'error', text:`${name}'s information could not be found in the server.`})
+          setTimeout(() => {
+            setNotificationMessage('')
+          }, 5000)
+        })
     }
     
   }
@@ -105,6 +124,8 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+
+      <Notification message={notificationMessage.text} type={notificationMessage.type} />
 
       <Filter filterValue={filter} handleSearch={handleSearchPeople} />
 
