@@ -7,19 +7,14 @@ import CountryList from './components/CountryList'
 function App() {
   const [value, setValue] = useState('')
   const [countries, setCountries] = useState([])
-  const [specificCountry, setSpecificCountry] = useState([])
   const [countriesAfterFilter, setCountriesAfterFilter] = useState([])
   const [weather, setWeather] = useState({})
 
-  const chosenCountry = specificCountry.length === 1
-
   useEffect( () => {
-    // if (value !== '') {
       countryService
         .getAll()
         .then(receivedCountries => {
           const characterCountries = receivedCountries.map((country) => {
-            /* console.log(country.capitalInfo) */
             return {
               name: country.name.common, 
               flag: country.flags.png, 
@@ -29,11 +24,8 @@ function App() {
               coordinates: country.capitalInfo.latlng
             }
           })
-/*           const filteredCountries = characterCountries.filter(country => country.name.toLowerCase().includes(value.toLowerCase()))
-          setCountries(filteredCountries) */
           setCountries(characterCountries)
         })
-
     }, [])
 
     useEffect( () => {
