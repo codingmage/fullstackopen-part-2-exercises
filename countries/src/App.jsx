@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import countryService from './services/countryData'
+import weatherService from './services/weatherData'
 import CountryList from './components/CountryList'
 
 function App() {
   const [value, setValue] = useState('')
   const [countries, setCountries] = useState([])
   const [specificCountry, setSpecificCountry] = useState([])
+  const [countriesAfterFilter, setCountriesAfterFilter] = useState([])
+  const [weather, setWeather] = useState({})
+
+  const chosenCountry = specificCountry.length === 1
 
   useEffect( () => {
     // if (value !== '') {
@@ -14,11 +19,15 @@ function App() {
         .getAll()
         .then(receivedCountries => {
           const characterCountries = receivedCountries.map((country) => {
+            /* console.log(country.capitalInfo) */
             return {
               name: country.name.common, 
               flag: country.flags.png, 
               languages: country.languages, 
-              area: country.area}
+              area: country.area,
+              capital: country.capital,
+              coordinates: country.capitalInfo.latlng
+            }
           })
 /*           const filteredCountries = characterCountries.filter(country => country.name.toLowerCase().includes(value.toLowerCase()))
           setCountries(filteredCountries) */
@@ -27,11 +36,28 @@ function App() {
 
     }, [])
 
-  const filterOn = value !== ''
+    useEffect( () => {
+      if (countriesAfterFilter.length === 1) {
+           weatherService
+            .getWeather(countriesAfterFilter[0].coordinates[0], countriesAfterFilter[0].coordinates[1])
+            .then(receivedWeather => {
+              const neededData = {
+                weather: receivedWeather.weather[0],
+                temperature: receivedWeather.main.temp,
+                wind: receivedWeather.wind.speed
+              }
+              setWeather(neededData)
+            })
+      }
+    }, [value, countriesAfterFilter])
+
+    useEffect(() => {
+      const filteredCountries = countries.filter((country => country.name.toLowerCase().includes(value.toLowerCase())))
+      setCountriesAfterFilter(filteredCountries)
+    }, [value])
 
   const handleChange = (event) => {
     setValue(event.target.value)
-    setSpecificCountry([])
   }
 
   const handleCountryClick = (event, country) => {
@@ -43,27 +69,19 @@ function App() {
             name: receivedCountry.name.common, 
             flag: receivedCountry.flags.png, 
             languages: receivedCountry.languages, 
-            area: receivedCountry.area
+            area: receivedCountry.area,
+            capital: receivedCountry.capital,
+            coordinates: receivedCountry.capitalInfo.latlng
           }]
-          setSpecificCountry(neededData)
+          setCountriesAfterFilter(neededData)
         })
   }
-
-  const countriesToShow = filterOn
-  ? countries.filter((country => country.name.toLowerCase().includes(value.toLowerCase())))
-  : []
-
-  const chosenCountry = specificCountry.length !== 0
-
-  const listOrSingle = chosenCountry
-  ? specificCountry
-  : countriesToShow
 
   return (
     <div>
       <form>
         <p>find countries <input value={value} onChange={handleChange} type='text'/></p>
-        <CountryList list={listOrSingle} handleClick={handleCountryClick} />
+        <CountryList list={countriesAfterFilter} handleClick={handleCountryClick} currentWeather={weather} />
       </form>
     </div>
   )

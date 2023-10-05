@@ -1,7 +1,10 @@
-const CountryList = ({ list, handleClick }) => {
+import { useEffect } from "react"
+import weatherService from '../services/weatherData'
+
+const CountryList = ({ list, handleClick, currentWeather }) => {
     const listSize = list.length
 
-    console.log(list)
+    const hasWeather = currentWeather.weather !== undefined
 
     if (listSize === 0) {
         return null
@@ -19,7 +22,6 @@ const CountryList = ({ list, handleClick }) => {
         )
     } else {
         const country = list[0]
-        console.log(country.languages)
 
         const languageList = Object.values(country.languages)
 
@@ -38,6 +40,17 @@ const CountryList = ({ list, handleClick }) => {
                 </ul>
 
                 <img src={country.flag} alt={`${country.name}'s flag`} />
+
+                <h3>Weather in {country.capital}</h3>
+
+                <p>Temperature {currentWeather.temperature} Celsius</p>
+
+                {hasWeather 
+                    ? <img src={`https://openweathermap.org/img/wn/${currentWeather.weather.icon}@2x.png`} alt={currentWeather.weather.description}/> 
+                    : null
+                }
+
+                <p>wind {currentWeather.wind} m/s</p>
 
             </div>
 
