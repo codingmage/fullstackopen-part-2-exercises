@@ -6,7 +6,7 @@
 }
 
 .errorMessage {
-    background-color: azure;
+    background-color: rgb(163, 181, 181);
     color: red;
     padding: 1rem;
     border-style: solid;
