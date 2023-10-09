@@ -86,6 +86,12 @@ const App = () => {
           setNotificationMessage('')
         }, 5000)
       })
+      .catch(error => {
+        setNotificationMessage({...notificationMessage, type: 'error', text: error.response.data.error})
+        setTimeout(() => {
+          setNotificationMessage('')
+        }, 5000)
+      })
 
 /*     setPersons([...persons, { name: newName, number: newNumber }]) */
     /* setPersons(persons.concat({ name: newName})) */
