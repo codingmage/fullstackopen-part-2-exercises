@@ -112,7 +112,10 @@ const App = () => {
 
       personService
         .removeNumber(id)
-         .then(setPersons(personsWithoutDeleted))
+         .then(
+          setPersons(personsWithoutDeleted),
+          setNotificationMessage({...notificationMessage, type: 'info', text:`${name}'s information was deleted from the server.`})
+          )
         .catch(error => {
           setNotificationMessage({...notificationMessage, type: 'error', text:`${name}'s information could not be found in the server.`})
           setTimeout(() => {
