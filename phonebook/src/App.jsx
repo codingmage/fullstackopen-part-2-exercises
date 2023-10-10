@@ -114,7 +114,10 @@ const App = () => {
         .removeNumber(id)
          .then(
           setPersons(personsWithoutDeleted),
-          setNotificationMessage({...notificationMessage, type: 'info', text:`${name}'s information was deleted from the server.`})
+          setNotificationMessage({...notificationMessage, type: 'info', text:`${name}'s information was deleted from the server.`}),
+          setTimeout(() => {
+            setNotificationMessage('')
+          }, 5000)
           )
         .catch(error => {
           setNotificationMessage({...notificationMessage, type: 'error', text:`${name}'s information could not be found in the server.`})
